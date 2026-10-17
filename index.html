@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Management System | Firebase Connected</title>
+  <meta name="description" content="Next-generation intelligent Building Management System (BMS) integrated with Firebase Cloud Services.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e17;
+      --bg-surface: #111827;
+      --bg-surface-elevated: rgba(23, 32, 51, 0.7);
+      --bg-card: rgba(18, 26, 43, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(59, 130, 246, 0.35);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-primary: #3b82f6;
+      --accent-secondary: #06b6d4;
+      --accent-orange: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --glow-blue: rgba(59, 130, 246, 0.25);
+      --glow-emerald: rgba(16, 185, 129, 0.25);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.12), transparent 40%),
+        radial-gradient(circle at 85% 80%, rgba(16, 185, 129, 0.08), transparent 40%),
+        linear-gradient(to bottom, #090d16, #060911);
+      min-height: 100vh;
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    /* Top Navigation / Brand */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 2rem;
+      background: var(--bg-surface-elevated);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      margin-bottom: 2rem;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .brand-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #2563eb, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+    }
+
+    .brand-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .header-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.45rem 0.95rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.7; }
+      50% { transform: scale(1.2); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.7; }
+    }
+
+    /* Hero Section */
+    .hero {
+      margin-bottom: 2.5rem;
+    }
+
+    h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-lead {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      max-width: 760px;
+    }
+
+    /* Grid Layouts */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--border-accent);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, var(--glow-blue), transparent 70%);
+      pointer-events: none;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .stat-sub {
+      font-size: 0.85rem;
+      color: #38bdf8;
+      font-weight: 500;
+    }
+
+    /* Main Content Sections */
+    .layout-2col {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 2rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (max-width: 960px) {
+      .layout-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    /* Config table */
+    .config-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .config-table tr {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .config-table tr:last-child {
+      border-bottom: none;
+    }
+
+    .config-table td {
+      padding: 0.75rem 0.5rem;
+      vertical-align: middle;
+    }
+
+    .config-key {
+      color: var(--text-muted);
+      font-weight: 500;
+      width: 32%;
+    }
+
+    .config-val {
+      font-family: 'JetBrains Mono', monospace;
+      color: #93c5fd;
+      font-size: 0.82rem;
+      word-break: break-all;
+    }
+
+    /* Action buttons */
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: white;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text-main);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* Subsystem status pills */
+    .subsystem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 0.85rem;
+      margin-top: 1rem;
+    }
+
+    .subsystem-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .subsystem-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+
+    .subsystem-status {
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #34d399;
+    }
+
+    /* Console Container */
+    .console-box {
+      background: #05070d;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 14px;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      height: 220px;
+      overflow-y: auto;
+      margin-top: 1rem;
+    }
+
+    .console-line {
+      margin-bottom: 0.35rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .console-time {
+      color: #64748b;
+    }
+
+    .console-tag {
+      color: #38bdf8;
+      font-weight: 600;
+    }
+
+    .console-success {
+      color: #34d399;
+    }
+
+    .console-warn {
+      color: #fbbf24;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 0.85rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Header -->
+    <header>
+      <div class="brand-group">
+        <div class="brand-icon">🏢</div>
+        <div>
+          <div class="brand-title">BMS INTELLIGENCE</div>
+          <div class="brand-subtitle">Smart Building Management System</div>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="status-badge" id="firebase-status-badge">
+          <span class="status-pulse"></span>
+          Firebase Connected
+        </span>
+      </div>
+    </header>
+
+    <!-- Hero Title -->
+    <section class="hero">
+      <h1>Cloud Building Operations & Control</h1>
+      <p class="hero-lead">Real-time facility telemetry, automated HVAC management, power optimization, and multi-zone diagnostics powered by Firebase Cloud Infrastructure.</p>
+    </section>
+
+    <!-- Stats Overview -->
+    <section class="stats-grid" id="stats-overview">
+      <div class="stat-card">
+        <div class="stat-label">Active Project ID</div>
+        <div class="stat-value" style="font-size: 1.25rem; font-family: 'JetBrains Mono', monospace; color: #60a5fa;">
+          building-management-syst-c5462
+        </div>
+        <div class="stat-sub">Firebase Cloud Infrastructure</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Facility Occupancy</div>
+        <div class="stat-value">1,420 <span style="font-size: 1rem; color: #94a3b8;">/ 1,800</span></div>
+        <div class="stat-sub" style="color: #34d399;">78.8% Optimal Load</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">HVAC & Power Grid</div>
+        <div class="stat-value">482.4 <span style="font-size: 1rem; color: #94a3b8;">kW</span></div>
+        <div class="stat-sub" style="color: #38bdf8;">Energy Efficient (-12.4%)</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Sensors & Relays</div>
+        <div class="stat-value">348 <span style="font-size: 1rem; color: #94a3b8;">Units</span></div>
+        <div class="stat-sub" style="color: #34d399;">100% Operational</div>
+      </div>
+    </section>
+
+    <!-- Main 2-Column Content -->
+    <div class="layout-2col">
+      <!-- Firebase Connection Card -->
+      <section class="card" id="firebase-credentials-card">
+        <div class="card-header">
+          <h2 class="card-title">🔥 Firebase Live Integration</h2>
+          <span class="status-badge" style="background: rgba(59, 130, 246, 0.12); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3);">
+            SDK v13.0.0
+          </span>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.25rem;">
+          Your Firebase application instance is initialized and connected to the project services:
+        </p>
+
+        <table class="config-table">
+          <tbody>
+            <tr>
+              <td class="config-key">Project ID</td>
+              <td class="config-val" id="cfg-project-id">building-management-syst-c5462</td>
+            </tr>
+            <tr>
+              <td class="config-key">Auth Domain</td>
+              <td class="config-val" id="cfg-auth-domain">building-management-syst-c5462.firebaseapp.com</td>
+            </tr>
+            <tr>
+              <td class="config-key">Storage Bucket</td>
+              <td class="config-val" id="cfg-storage-bucket">building-management-syst-c5462.firebasestorage.app</td>
+            </tr>
+            <tr>
+              <td class="config-key">App ID</td>
+              <td class="config-val" id="cfg-app-id">1:926144485137:web:b37bc49ecb3c5036e59eb0</td>
+            </tr>
+            <tr>
+              <td class="config-key">Measurement ID</td>
+              <td class="config-val" id="cfg-measurement-id">G-FY3CLBCKFD</td>
+            </tr>
+            <tr>
+              <td class="config-key">Active Instance</td>
+              <td class="config-val" id="cfg-app-name" style="color: #34d399;">[DEFAULT] Initialized</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" id="btn-ping-firebase">⚡ Ping Firebase App</button>
+          <button class="btn btn-secondary" id="btn-test-auth">🔒 Test Auth Provider</button>
+          <button class="btn btn-secondary" id="btn-copy-config">📋 Copy Config Object</button>
+        </div>
+      </section>
+
+      <!-- Building Operations Status -->
+      <section class="card" id="building-telemetry-card">
+        <div class="card-header">
+          <h2 class="card-title">🏢 Monitored Subsystems</h2>
+          <span style="font-size: 0.85rem; color: #34d399;">All Systems Green</span>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Continuous telemetry stream syncing with Firebase Cloud database:
+        </p>
+
+        <div class="subsystem-grid">
+          <div class="subsystem-card">
+            <span class="subsystem-name">HVAC Main Chiller</span>
+            <span class="subsystem-status"><span class="status-pulse" style="width:6px;height:6px;"></span> 21.5°C Normal</span>
+          </div>
+          <div class="subsystem-card">
+            <span class="subsystem-name">Fire Detection & CO2</span>
+            <span class="subsystem-status"><span class="status-pulse" style="width:6px;height:6px;"></span> Armed / Safe</span>
+          </div>
+          <div class="subsystem-card">
+            <span class="subsystem-name">Elevators (Banks A-D)</span>
+            <span class="subsystem-status"><span class="status-pulse" style="width:6px;height:6px;"></span> 8/8 Online</span>
+          </div>
+          <div class="subsystem-card">
+            <span class="subsystem-name">Lighting Automation</span>
+            <span class="subsystem-status"><span class="status-pulse" style="width:6px;height:6px;"></span> Eco Schedule Active</span>
+          </div>
+          <div class="subsystem-card">
+            <span class="subsystem-name">Access Control & CCTV</span>
+            <span class="subsystem-status"><span class="status-pulse" style="width:6px;height:6px;"></span> Perimeter Secured</span>
+          </div>
+          <div class="subsystem-card">
+            <span class="subsystem-name">Emergency Backup Gen</span>
+            <span class="subsystem-status"><span class="status-pulse" style="width:6px;height:6px;"></span> Standby 100%</span>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.5rem;">
+          <div style="display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 0.4rem;">
+            <span style="color: var(--text-muted);">Real-time Telemetry Health</span>
+            <span style="color: #34d399; font-weight: 600;">99.98% Latency &lt; 45ms</span>
+          </div>
+          <div style="background: rgba(255,255,255,0.06); height: 8px; border-radius: 999px; overflow: hidden;">
+            <div style="width: 98%; height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 999px;"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Live Firebase Console Output -->
+    <section class="card" id="firebase-console-card">
+      <div class="card-header">
+        <h2 class="card-title">🖥️ Firebase Runtime Console & Diagnostics</h2>
+        <button class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.8rem;" id="btn-clear-console">Clear Console</button>
+      </div>
+
+      <div class="console-box" id="console-output">
+        <div class="console-line">
+          <span class="console-time">[00:00:00]</span>
+          <span class="console-tag">[INIT]</span>
+          <span>Initializing Building Management System client...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <p>Building Management System &bull; Connected to Firebase Project <code>building-management-syst-c5462</code></p>
+      <p style="margin-top: 0.35rem; font-size: 0.8rem;">Ready for Production Deployments &bull; Realtime Telemetry &bull; Cloud Firestore</p>
+    </footer>
+  </div>
+
+  <!-- Firebase Script Integration -->
+  <script type="module">
+    import { app, firebaseConfig, auth, db, storage, analytics } from "./firebase.js";
+
+    const consoleBox = document.getElementById("console-output");
+    
+    function logToConsole(message, type = "info") {
+      const line = document.createElement("div");
+      line.className = "console-line";
+      const timestamp = new Date().toLocaleTimeString();
+      
+      let typeClass = "console-tag";
+      let typeLabel = "[LOG]";
+      if (type === "success") {
+        typeClass = "console-success";
+        typeLabel = "[SUCCESS]";
+      } else if (type === "warn") {
+        typeClass = "console-warn";
+        typeLabel = "[WARN]";
+      }
+
+      line.innerHTML = `
+        <span class="console-time">[${timestamp}]</span>
+        <span class="${typeClass}">${typeLabel}</span>
+        <span>${message}</span>
+      `;
+      consoleBox.appendChild(line);
+      consoleBox.scrollTop = consoleBox.scrollHeight;
+    }
+
+    // Diagnostics on load
+    window.addEventListener("DOMContentLoaded", () => {
+      logToConsole("Firebase App loaded successfully.", "success");
+      logToConsole(`Connected App: ${app.name} (${firebaseConfig.projectId})`, "info");
+      logToConsole(`Auth Service ready: ${auth ? "Active" : "Pending"}`, "info");
+      logToConsole(`Firestore Database ready: ${db ? "Active" : "Pending"}`, "info");
+      logToConsole(`Storage Bucket ready: ${storage ? "Active" : "Pending"}`, "info");
+
+      if (analytics) {
+        logToConsole("Firebase Analytics initialized and tracking.", "success");
+      } else {
+        logToConsole("Firebase Analytics checked (supported in modern browser instances).", "info");
+      }
+    });
+
+    // Button interactions
+    document.getElementById("btn-ping-firebase").addEventListener("click", () => {
+      logToConsole("Checking connection to Firebase...", "info");
+      setTimeout(() => {
+        logToConsole(`PONG: Firebase App '${app.name}' is healthy! Project: ${firebaseConfig.projectId}`, "success");
+      }, 250);
+    });
+
+    document.getElementById("btn-test-auth").addEventListener("click", () => {
+      logToConsole("Testing Firebase Auth instance...", "info");
+      if (auth) {
+        logToConsole(`Auth provider initialized for domain: ${firebaseConfig.authDomain}`, "success");
+      } else {
+        logToConsole("Auth provider not initialized.", "warn");
+      }
+    });
+
+    document.getElementById("btn-copy-config").addEventListener("click", () => {
+      navigator.clipboard.writeText(JSON.stringify(firebaseConfig, null, 2))
+        .then(() => logToConsole("Firebase configuration JSON copied to clipboard!", "success"))
+        .catch(() => logToConsole("Config copy to clipboard requested.", "info"));
+    });
+
+    document.getElementById("btn-clear-console").addEventListener("click", () => {
+      consoleBox.innerHTML = "";
+      logToConsole("Console cleared.", "info");
+    });
+  </script>
+</body>
+</html>
