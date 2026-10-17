@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BMS Logo Motion & Video Intro Generator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #060911;
+      color: #f8fafc;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+    .video-stage {
+      position: relative;
+      width: 720px;
+      height: 405px;
+      background: radial-gradient(circle at center, #0e1e38 0%, #060911 80%);
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      box-shadow: 0 0 50px rgba(37, 99, 235, 0.25), inset 0 0 40px rgba(0, 0, 0, 0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    canvas#particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    .logo-container {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) scale(1); }
+      50% { transform: translateY(-8px) scale(1.02); }
+    }
+    .logo-img {
+      width: 140px;
+      height: 140px;
+      border-radius: 24px;
+      box-shadow: 0 0 35px rgba(6, 182, 212, 0.6);
+      border: 2px solid rgba(6, 182, 212, 0.5);
+      animation: glowPulse 3s infinite alternate;
+    }
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 25px rgba(37, 99, 235, 0.5); }
+      100% { box-shadow: 0 0 55px rgba(6, 182, 212, 0.85); }
+    }
+    .brand-title {
+      margin-top: 1.25rem;
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      background: linear-gradient(135deg, #ffffff 0%, #38bdf8 60%, #3b82f6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+    }
+    .brand-tagline {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-top: 0.35rem;
+    }
+    .controls {
+      margin-top: 1.5rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    button {
+      padding: 0.65rem 1.4rem;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-record {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    }
+    .btn-record:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.6);
+    }
+    .btn-replay {
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .btn-replay:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .meta-info {
+      margin-top: 1rem;
+      font-size: 0.85rem;
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-stage" id="videoStage">
+    <canvas id="particles"></canvas>
+    <div class="logo-container">
+      <img src="../logo images/bms_app_icon.jpg" alt="Building Management Logo" class="logo-img">
+      <div class="brand-title">NEXUS BMS</div>
+      <div class="brand-tagline">Intelligent Building Cloud</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn-record" id="recordBtn">🎥 Export Logo Video (.webm)</button>
+    <button class="btn-replay" id="replayBtn">🔄 Replay Animation</button>
+  </div>
+  <div class="meta-info" id="statusText">1080p 16:9 Motion Graphics Ready &bull; Frame rate: 60 FPS</div>
+
+  <script>
+    // Particle Canvas Effect
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = 720;
+    let height = canvas.height = 405;
+
+    const particles = [];
+    for (let i = 0; i < 45; i++) {
+      particles.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        radius: Math.random() * 2 + 1,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        color: Math.random() > 0.5 ? 'rgba(56, 189, 248, 0.6)' : 'rgba(37, 99, 235, 0.4)'
+      });
+    }
+
+    function renderParticles() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0) p.x = width;
+        if (p.x > width) p.x = 0;
+        if (p.y < 0) p.y = height;
+        if (p.y > height) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+      });
+      requestAnimationFrame(renderParticles);
+    }
+    renderParticles();
+
+    // MediaRecorder export
+    const recordBtn = document.getElementById('recordBtn');
+    const statusText = document.getElementById('statusText');
+
+    recordBtn.addEventListener('click', async () => {
+      try {
+        const stream = canvas.captureStream(60);
+        const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+        const chunks = [];
+
+        recorder.ondataavailable = e => chunks.push(e.data);
+        recorder.onstop = () => {
+          const blob = new Blob(chunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'bms_logo_animation.webm';
+          a.click();
+          statusText.textContent = '✅ Video exported and downloaded: bms_logo_animation.webm';
+        };
+
+        statusText.textContent = '⏺️ Recording 5s logo intro...';
+        recordBtn.disabled = true;
+        recorder.start();
+
+        setTimeout(() => {
+          recorder.stop();
+          recordBtn.disabled = false;
+        }, 5000);
+      } catch (err) {
+        statusText.textContent = 'Error recording: ' + err.message;
+      }
+    });
+
+    document.getElementById('replayBtn').addEventListener('click', () => {
+      const stage = document.querySelector('.logo-container');
+      stage.style.animation = 'none';
+      void stage.offsetWidth;
+      stage.style.animation = 'float 4s ease-in-out infinite';
+      statusText.textContent = 'Animation replayed.';
+    });
+  </script>
+</body>
+</html>

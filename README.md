@@ -22,6 +22,8 @@ const firebaseConfig = {
 
 - `firebase.js`: Modular Firebase initialization exporting `app`, `auth`, `db`, `storage`, `analytics`, and `firebaseConfig`.
 - `index.html`: Interactive web dashboard displaying telemetry diagnostics and verifying Firebase connection health in real time.
+- `logo images/`: Dedicated directory for high-resolution brand identity logos, emblems, and app icons.
+- `logo videos/`: Dedicated directory for motion graphics, video bumpers, and interactive animated intro generator (`animated_logo_intro.html`).
 - `.env.example`: Template for environment variables (compatible with Vite, React, and Next.js).
 
 ## 🌐 Quick Start
